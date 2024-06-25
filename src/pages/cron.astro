@@ -5,8 +5,19 @@ const CHAT_ID = import.meta.env.CHAT_ID
 var data;
 var res = "";
   try {
+    // Lấy ngày giờ hiện tại
+    const currentDateTime = new Date();
+    // const year = currentDateTime.getFullYear();
+    // const month = String(currentDateTime.getMonth() + 1).padStart(2, '0');
+    // const day = String(currentDateTime.getDate()).padStart(2, '0');
+    // const hours = String(currentDateTime.getHours()).padStart(2, '0');
+    // const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
+    // const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
+    // const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const formattedDateTime = currentDateTime.toLocaleString();
+
     // Gửi request đến URL nhất định
-    const response = await fetch('http://sjc.com.vn/xml/tygiavang.xml');
+    const response = await fetch('http://sjc.com.vn/xml/tygiavang.xml?t='+currentDateTime.getTime());
     const xmlData = await response.text();
 
     // Hàm để trích xuất dữ liệu từ XML
@@ -36,17 +47,9 @@ var res = "";
 
 
     // Chuẩn bị thông báo Telegram với dữ liệu giá vàng
-    data = goldPrices.map(price => `Type: ${price.type}, Buy: ${price.buy}, Sell: ${price.sell}`).join('\n');
+    data = goldPrices.map(price => `<b>${price.type}</b> -- Buy: <code>${price.buy}</code>, Sell: <code>${price.sell}</code>`).join('\n');
     
-    // Lấy ngày giờ hiện tại
-    const currentDateTime = new Date();
-    const year = currentDateTime.getFullYear();
-    const month = String(currentDateTime.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDateTime.getDate()).padStart(2, '0');
-    const hours = String(currentDateTime.getHours()).padStart(2, '0');
-    const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
-    const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
-    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    
 
     // Gửi thông báo Telegram
     const telegramResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -56,7 +59,8 @@ var res = "";
       },
       body: JSON.stringify({
         chat_id: CHAT_ID,
-        text: `${formattedDateTime}: ${data}`,
+        text: `${formattedDateTime}:\n${data}`,
+        parse_mode: 'html'
       }),
     });
 

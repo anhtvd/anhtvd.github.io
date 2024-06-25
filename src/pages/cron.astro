@@ -14,7 +14,7 @@ var res = "";
     // const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
     // const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
     // const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    const formattedDateTime = currentDateTime.toLocaleString();
+    const formattedDateTime = currentDateTime.toLocaleString('vn-VN', {timeZone: 'Asia/Ho_Chi_Minh' });
 
     // Gửi request đến URL nhất định
     const response = await fetch('http://sjc.com.vn/xml/tygiavang.xml?t='+currentDateTime.getTime());

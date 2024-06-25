@@ -1,0 +1,77 @@
+---
+
+const BOT_TOKEN = "882723082:AAG3XmAqoWo1BM1J6N-qtAxgHns3Xszo0I4"
+const CHAT_ID = '-1002157245425'
+var data;
+var res = "";
+  try {
+    // Gửi request đến URL nhất định
+    const response = await fetch('http://sjc.com.vn/xml/tygiavang.xml');
+    const xmlData = await response.text();
+
+    // Hàm để trích xuất dữ liệu từ XML
+    const extractData = (xml, tag) => {
+      const regex = new RegExp(`<${tag}([^>]*)>`, 'g');
+      const matches = [];
+      let match;
+      while ((match = regex.exec(xml)) !== null) {
+        matches.push(match[1]);
+      }
+      return matches;
+    };
+
+    // Trích xuất các items
+    const items = extractData(xmlData, 'item');
+    const goldPrices = items.map(item => {
+      const typeMatch = item.match(/type="([^"]*)"/);
+      const buyMatch = item.match(/buy="([^"]*)"/);
+      const sellMatch = item.match(/sell="([^"]*)"/);
+      return {
+        type: typeMatch ? typeMatch[1] : '',
+        buy: buyMatch ? buyMatch[1] : '',
+        sell: sellMatch ? sellMatch[1] : ''
+      };
+    });
+
+
+
+    // Chuẩn bị thông báo Telegram với dữ liệu giá vàng
+    data = goldPrices.map(price => `Type: ${price.type}, Buy: ${price.buy}, Sell: ${price.sell}`).join('\n');
+    
+    // Lấy ngày giờ hiện tại
+    const currentDateTime = new Date();
+    const year = currentDateTime.getFullYear();
+    const month = String(currentDateTime.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDateTime.getDate()).padStart(2, '0');
+    const hours = String(currentDateTime.getHours()).padStart(2, '0');
+    const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
+    const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
+    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+    // Gửi thông báo Telegram
+    const telegramResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: `${formattedDateTime}: ${data}`,
+      }),
+    });
+
+    // Kiểm tra kết quả từ Telegram
+    if (telegramResponse.ok) {
+      res = 'Notification sent successfully';
+    } else {
+      res = 'Failed to send notification';
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res = 'Error occurred';
+  }
+---
+<pre>
+{data}
+{res}
+</pre>

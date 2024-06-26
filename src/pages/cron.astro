@@ -4,6 +4,7 @@ const BOT_TOKEN = import.meta.env.BOT_TOKEN
 const CHAT_ID = import.meta.env.CHAT_ID
 var data;
 var res = "";
+var formattedDateTime;
   try {
     // Lấy ngày giờ hiện tại
     const currentDateTime = new Date();
@@ -14,7 +15,7 @@ var res = "";
     // const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
     // const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
     // const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    const formattedDateTime = currentDateTime.toLocaleString('vn-VN', {timeZone: 'Asia/Ho_Chi_Minh' });
+    formattedDateTime = currentDateTime.toLocaleString('vn-VN', {timeZone: 'Asia/Ho_Chi_Minh' });
 
     // Gửi request đến URL nhất định
     const response = await fetch('http://sjc.com.vn/xml/tygiavang.xml?t='+currentDateTime.getTime());
@@ -75,7 +76,7 @@ var res = "";
     res = 'Error occurred';
   }
 ---
-<pre>
-{data}
+{formattedDateTime}
+<head><meta charset="utf-8"></head>
+<div style="white-space: pre-line;" set:html={data} ></div>
 {res}
-</pre>

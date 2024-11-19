@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Encrypted Blog</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        /* Reset and general styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .container {
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        textarea, input[type="password"] {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 48%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem 1%;
+            display: inline-block;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        pre {
+            background: #f9f9f9;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            button {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Encrypted Blog</h1>
+        <p>Securely write and encrypt your blog posts.</p>
+    </header>
+    <div class="container">
+        <h2>Write Your Blog Post</h2>
+        <textarea id="blogContent" placeholder="Write your blog content here..."></textarea>
+        <input type="password" id="encryptionKey" placeholder="Enter encryption key" />
+        <div style="text-align: center;">
+            <button onclick="encryptBlog()">Encrypt & Save</button>
+            <button onclick="decryptBlog()">Decrypt</button>
+        </div>
+        <h3>Encrypted Content:</h3>
+        <pre id="encryptedContent"></pre>
+    </div>
+    <footer>
+        <p>&copy; 2024 My Encrypted Blog</p>
+    </footer>
+
+    <script>
+        // Function to encrypt blog content
+        function encryptBlog() {
+            const content = document.getElementById('blogContent').value;
+            const key = document.getElementById('encryptionKey').value;
+
+            if (!content || !key) {
+                alert('Please enter content and an encryption key!');
+                return;
+            }
+
+            // Encrypt content using AES
+            const encrypted = CryptoJS.AES.encrypt(content, key).toString();
+
+            document.getElementById('encryptedContent').innerText = encrypted;
+
+            // Optionally, save encrypted content to localStorage
+            localStorage.setItem('encryptedBlog', encrypted);
+            alert('Content encrypted and saved!');
+        }
+
+        // Function to decrypt blog content
+        function decryptBlog() {
+            const encrypted = document.getElementById('encryptedContent').innerText;
+            const key = document.getElementById('encryptionKey').value;
+
+            if (!encrypted || !key) {
+                alert('Please provide encrypted content and an encryption key!');
+                return;
+            }
+
+            // Decrypt content using AES
+            try {
+                const bytes = CryptoJS.AES.decrypt(encrypted, key);
+                const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+
+                if (!decrypted) {
+                    throw new Error('Decryption failed!');
+                }
+
+                document.getElementById('blogContent').value = decrypted;
+                alert('Content decrypted successfully!');
+            } catch (e) {
+                alert('Invalid key or corrupted data!');
+            }
+        }
+    </script>
+</body>
+</html>
